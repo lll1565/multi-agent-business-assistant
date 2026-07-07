@@ -59,6 +59,7 @@ def test_diagram_agent_build_is_cached(monkeypatch):
     finally:
         diagram_sub_agent.create_npi_diagram_agent.cache_clear()
 
+
 @pytest.mark.parametrize(
     "message",
     [
