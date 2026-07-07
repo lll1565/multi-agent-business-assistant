@@ -1,36 +1,71 @@
-import {sanitizeAssistantText, sanitizeTraceStepDetail} from "./textSanitizer";
+const SAFE_STATUS_TEXT = {
+  analyzing: "正在分析问题",
+  db: "正在查询业务数据",
+  api: "正在检索接口文档",
+  web: "正在搜索网页信息",
+  diagram: "正在生成图表",
+  organizing: "正在整理结果",
+};
 
-function narrativeForStep(step, { live = false } = {}) {
-  const t = step.type || "";
-  if (t === "thinking" || t === "sub_thinking") {
-    const d = live
-      ? sanitizeAssistantText(step.detail)
-      : sanitizeTraceStepDetail(step.detail, t);
-    return d || "";
+const AGENT_STATUS = {
+  npi_db_agent: "db",
+  npi_api_agent: "api",
+  npi_web_agent: "web",
+  npi_diagram_agent: "diagram",
+};
+
+function statusKeyForStep(step = {}) {
+  if (step.type === "status") {
+    for (const [key, text] of Object.entries(SAFE_STATUS_TEXT)) {
+      if (step.title === text) return key;
+    }
+    return "analyzing";
   }
-  if (t === "delegate") {
-    return step.detail?.trim() || step.title || "";
+  if (["thinking", "sub_thinking", "plan"].includes(step.type || "")) return "analyzing";
+
+  const agent = String(step.agent || "");
+  if (AGENT_STATUS[agent]) return AGENT_STATUS[agent];
+
+  const blob = [step.type, step.title, step.detail].map((v) => String(v || "").toLowerCase()).join(" ");
+  if (blob.includes("npi_db_agent") || blob.includes("sql") || blob.includes("数据库")) return "db";
+  if (blob.includes("npi_api_agent") || blob.includes("api") || blob.includes("接口")) return "api";
+  if (blob.includes("npi_web_agent") || blob.includes("web") || blob.includes("网页") || blob.includes("搜索")) return "web";
+  if (blob.includes("npi_diagram_agent") || blob.includes("diagram") || blob.includes("图表") || blob.includes("流程图") || blob.includes("架构图")) return "diagram";
+  if (["tool_result", "sub_tool_result", "sub_summary", "info"].includes(step.type || "")) return "organizing";
+  return "analyzing";
+}
+
+export function buildSafeStatusLines(trace) {
+  const steps = trace?.steps || [];
+  const seen = new Set();
+  const lines = [];
+
+  for (const step of steps) {
+    const key = statusKeyForStep(step);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    lines.push(SAFE_STATUS_TEXT[key]);
   }
-  if (t === "tool" || t === "sub_tool") {
-    return step.title || "";
+
+  for (const agent of trace?.agents_used || []) {
+    const key = AGENT_STATUS[String(agent || "")];
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    lines.push(SAFE_STATUS_TEXT[key]);
   }
-  if (t === "plan") {
-    return live
-      ? sanitizeAssistantText(step.detail)
-      : sanitizeTraceStepDetail(step.detail, t);
-  }
-  return "";
+
+  return lines;
+}
+
+function narrativeForStep(step) {
+  return SAFE_STATUS_TEXT[statusKeyForStep(step)] || "";
 }
 
 /**
  * Build full narrative (for non-streaming display).
  */
 export function buildStreamingNarrative(trace) {
-  if (!trace?.steps?.length) return "";
-  return trace.steps
-    .map((s) => narrativeForStep(s, { live: true }))
-    .filter(Boolean)
-    .join("\n\n");
+  return buildSafeStatusLines(trace).join("\n\n");
 }
 
 /**
@@ -93,11 +128,7 @@ export function nextTraceNarrative(trace, fromStepIndex = 0) {
 
 /** 历史消息：从 trace 还原思考正文 */
 export function buildThinkingDisplayText(trace) {
-  if (!trace?.steps?.length) return "";
-  return trace.steps
-    .map((s) => narrativeForStep(s, { live: false }))
-    .filter(Boolean)
-    .join("\n\n");
+  return buildSafeStatusLines(trace).join("\n\n");
 }
 
 /** @deprecated use appendStreamBuffer */

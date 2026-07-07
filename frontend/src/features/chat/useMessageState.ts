@@ -1,6 +1,5 @@
 import {
   appendStreamBuffer,
-  appendTraceSteps,
   buildThinkingDisplayText,
 } from "../../utils/traceNarrative.js";
 import type { ChatMessage, ReasoningTrace } from "./types";
@@ -113,7 +112,6 @@ export function useMessageState() {
     onAnswerRevealDone,
     finalizeAssistantMessage,
     appendAnswerChunk,
-    appendTraceSteps,
   };
 }
 

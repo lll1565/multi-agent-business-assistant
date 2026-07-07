@@ -58,18 +58,25 @@ def build_capability_reply() -> str:
     if not specs:
         return (
             "## 我能帮你做什么\n\n"
-            "我是 **Stone 多智能体助手**。当前暂无已注册的能力模块。"
+            "我是一个多能力助手。当前暂无已注册的能力。"
         )
 
     sections = "\n\n".join(build_capability_section(spec) for spec in specs)
     count = len(specs)
+    flow = " → ".join(resolve_capability_title(spec) for spec in specs)
     return (
         "## 我能帮你做什么\n\n"
-        f"我是 **Stone 多智能体助手**，用自然语言理解你的需求，"
-        f"并自动完成下面 {count} 类任务：\n\n"
+        f"我是一个面向业务查询与知识检索的多能力助手。你直接描述需求即可，"
+        f"我会在下面 {count} 类能力中选择合适路径：\n\n"
         f"{sections}\n\n"
+        "### 系统工作流程\n"
+        "- 理解你的问题\n"
+        "- 选择匹配的能力路径\n"
+        "- 获取或生成结果\n"
+        "- 整理成可阅读的中文回答\n\n"
+        f"当前能力覆盖：{flow}。\n\n"
         "---\n\n"
-        "直接说出你的问题即可，我会自动选择合适的工具。"
+        "直接说出你的问题即可。"
     )
 
 
@@ -77,8 +84,8 @@ def build_greeting_reply() -> str:
     specs = sorted_capability_specs()
     if not specs:
         return (
-            "你好！我是 **Stone 多智能体助手**。\n"
-            "有什么需要，直接说就好——**不用记命令**。"
+            "你好！我是一个多能力助手。\n"
+            "有什么需要，直接说就好，不用记命令。"
         )
 
     titles = [resolve_capability_title(spec) for spec in specs]
@@ -90,7 +97,7 @@ def build_greeting_reply() -> str:
         caps = "、".join(f"**{title}**" for title in titles[:-1]) + f"和 **{titles[-1]}**"
 
     return (
-        f"你好！我是 **Stone 多智能体助手**。\n"
+        f"你好！我是一个多能力助手。\n"
         f"我可以帮你：{caps}。\n"
-        "有什么需要，直接说就好——**不用记命令**。"
+        "有什么需要，直接说就好，不用记命令。"
     )

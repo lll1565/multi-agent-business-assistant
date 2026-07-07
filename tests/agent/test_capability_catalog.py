@@ -21,11 +21,12 @@ def test_capability_reply_lists_all_registered_agents():
     reset_registry()
     try:
         reply = build_capability_reply()
-        assert "4 类任务" in reply
+        assert "4 类能力" in reply
         assert "### 数据库查询" in reply
         assert "### API 接口文档" in reply
         assert "### 网页搜索" in reply
         assert "### 图表绘制" in reply
+        assert "系统工作流程" in reply
         assert "get_users 接口文档" in reply
         assert "画一个下单流程图" in reply
     finally:
@@ -56,6 +57,28 @@ def test_meta_fast_path_capability_query():
         reset_registry()
 
 
+def test_meta_fast_path_system_workflow_query():
+    reset_registry()
+    try:
+        result = try_meta_fast_path("介绍系统工作流程")
+        assert result is not None
+        reply = result["reply"]
+        assert "数据库查询" in reply
+        assert "API 接口文档" in reply
+        assert "网页搜索" in reply
+        assert "图表绘制" in reply
+        assert "系统工作流程" in reply
+        assert "npi_" not in reply
+        assert "Supervisor" not in reply
+        assert "委派" not in reply
+    finally:
+        reset_registry()
+
+
+def test_real_diagram_request_is_not_meta_fast_path():
+    assert try_meta_fast_path("帮我画一个业务流程图") is None
+
+
 def test_new_agent_extends_capability_reply():
     reset_registry()
     try:
@@ -76,7 +99,7 @@ def test_new_agent_extends_capability_reply():
         )
         reply = build_meta_reply("help")
         assert "### 演示扩展" in reply
-        assert "5 类任务" in reply
+        assert "5 类能力" in reply
         assert "试一下演示能力" in reply
     finally:
         reset_registry()

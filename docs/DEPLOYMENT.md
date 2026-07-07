@@ -1,173 +1,234 @@
-# 生产部署指南
+# 部署说明
 
-本文说明如何将 Multi-Agent Chat System 部署到单机/内网生产环境。当前架构为 **SQLite 三库 + 单 Uvicorn worker**，适合 PoC、内网工具或中小流量场景。
+本文说明如何在 Windows 本地和 Docker Compose 环境运行本项目。项目定位为学习和展示用途，不宣称为完整生产系统。
 
----
+## 1. 版本要求
 
-## 架构约束
+- Python 3.11
+- Node.js 22
+- npm
+- Docker Desktop（Docker 部署时需要）
+- Graphviz 可选
 
-| 项 | 生产建议 |
-|----|----------|
-| Worker 数 | **必须为 1**（LangGraph SQLite checkpoint 共享） |
-| 数据库 | 默认 SQLite；高并发需迁移 Postgres checkpoint（见文末演进） |
-| 前端 | Docker 镜像内已构建，`SERVE_FRONTEND=true` 时由 FastAPI 托管 |
-| LLM | 需配置 `OPENAI_API_KEY`（MiniMax 兼容 OpenAI API） |
+Graphviz 说明：
 
----
+- 本地未安装 Graphviz 时，图表能力会降级返回 DOT 源码。
+- Docker 后端镜像安装 Graphviz，容器内 `dot` 命令可用。
 
-## 1. 环境变量
+## 2. Windows 本地部署
 
-复制并编辑 `.env`：
+以下命令均从项目根目录执行。
+
+### 2.1 创建 Python 虚拟环境
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+### 2.2 安装后端依赖
+
+```powershell
+pip install -e ".[dev]"
+```
+
+### 2.3 准备环境变量
+
+```powershell
+copy .env.example .env
+```
+
+编辑 `.env`，填写模型接口配置：
+
+```env
+OPENAI_API_KEY=your_api_key_here
+OPENAI_BASE_URL=https://example-openai-compatible-endpoint/v1
+OPENAI_MODEL=your-model-name
+```
+
+不要把真实 `.env` 提交到仓库。
+
+### 2.4 初始化演示业务库
+
+```powershell
+multi-agent-init-demo
+```
+
+如果命令不可用，也可以使用：
+
+```powershell
+python scripts/demo_db.py
+```
+
+### 2.5 安装前端依赖
+
+```powershell
+cd frontend
+npm ci
+cd ..
+```
+
+### 2.6 启动后端
+
+```powershell
+.\scripts\run_backend.ps1
+```
+
+后端地址：
+
+- `http://127.0.0.1:8010`
+- Swagger：`http://127.0.0.1:8010/api/docs`
+
+### 2.7 启动前端
+
+另开一个终端，从项目根目录执行：
+
+```powershell
+.\scripts\run_frontend.ps1
+```
+
+前端地址：
+
+- `http://127.0.0.1:5143`
+
+## 3. Docker Compose 部署
+
+Docker 使用两个服务：
+
+- `backend`：FastAPI + Agent + SQLite + Graphviz，端口 `8010`
+- `frontend`：Nginx 托管 Vue 构建产物，端口 `5143`
+
+### 3.1 准备配置
 
 ```bash
 cp .env.example .env
 ```
 
-**生产最小配置：**
+填写 `.env` 中的模型接口配置。`.env` 只在 compose 运行时注入，不会复制进镜像。
+
+### 3.2 启动
+
+```bash
+docker compose up --build
+```
+
+访问：
+
+- 前端页面：`http://localhost:5143`
+- Swagger：`http://localhost:8010/api/docs`
+- 健康检查：`http://localhost:8010/api/health`
+
+### 3.3 数据持久化
+
+Compose 将本机 `./data` 挂载到后端容器 `/app/data`：
+
+- `/app/data/demo.db`
+- `/app/data/chat.db`
+- `/app/data/agent_checkpoints.db`
+- `/app/data/logs/`
+
+后端入口脚本会在 `demo.db` 不存在时自动初始化演示业务库。
+
+## 4. 端口
+
+| 服务 | 端口 |
+|---|---|
+| backend | `8010` |
+| frontend | `5143` |
+
+端口配置来源于 `src/backend/config/ports.json`，本地脚本和 Vite 配置会读取该文件。
+
+## 5. .env 安全说明
+
+`.env.example` 只放示例值。真实 `.env` 可能包含模型 API Key，禁止提交。
+
+注意：部分 Docker Compose 版本执行 `docker compose config` 时会展开 `.env` 中的变量。不要把包含真实密钥的命令输出直接粘贴到公开 Issue、文档或截图中。
+
+建议公开仓库前检查：
+
+```bash
+git status --short
+```
+
+确认没有 `.env`、`data/*.db`、日志、虚拟环境或 `node_modules`。
+
+## 6. 常见错误排查
+
+### 6.1 前端启动找不到 package.json
+
+请从项目根目录执行：
+
+```powershell
+.\scripts\run_frontend.ps1
+```
+
+脚本会根据自身路径定位 `frontend/package.json`，如果路径异常会直接报错。
+
+### 6.2 后端提示 OPENAI_API_KEY 未配置
+
+检查 `.env`：
 
 ```env
-APP_ENV=production
-OPENAI_API_KEY=your_key
-OPENAI_BASE_URL=https://api.minimaxi.com/v1
-OPENAI_MODEL=MiniMax-M2.7
-
-API_AUTH_KEY=change-me-to-a-long-random-string
-CHAT_RATE_LIMIT_PER_MINUTE=30
-
-CORS_ORIGINS=https://your-domain.example
-TRUSTED_HOSTS=your-domain.example,localhost
-
-SERVE_FRONTEND=true
-LOG_FORMAT=json
-LOG_LEVEL=INFO
-
-DATA_DIR=/app/data
+OPENAI_API_KEY=your_api_key_here
+OPENAI_BASE_URL=https://example-openai-compatible-endpoint/v1
+OPENAI_MODEL=your-model-name
 ```
 
-| 变量 | 说明 |
-|------|------|
-| `APP_ENV=production` | 启用生产检查（如 `/api/ready` 要求 API Key） |
-| `API_AUTH_KEY` | 非空时，除 health/ready/docs 外需 `X-API-Key` 或 `Authorization: Bearer` |
-| `CHAT_RATE_LIMIT_PER_MINUTE` | 每 IP 每分钟聊天请求上限，`0` 关闭 |
-| `TRUSTED_HOSTS` | Host 头白名单，防 Host Header 攻击 |
-| `SERVE_FRONTEND` | 托管 `frontend/dist` 静态资源 |
-| `DATA_DIR` | 运行时数据根（三库 + 日志） |
+修改后重启后端。
 
-前端构建时传入 API Key（与后端 `API_AUTH_KEY` 一致）：
+### 6.3 `/api/ready` 返回 503
 
-```bash
-cd frontend && VITE_API_KEY=your-key npm run build
+`/api/ready` 会检查模型 Key、会话库和 checkpoint 目录。根据返回的 `checks` 字段排查。
+
+### 6.4 PowerShell 无法运行 npm
+
+如果 `npm run ...` 被执行策略拦截，可以使用：
+
+```powershell
+npm.cmd run test
+npm.cmd run typecheck
+npm.cmd run build
 ```
 
-Docker 镜像在构建阶段已执行 `npm run build`；若需 Key，在 Dockerfile 中增加 `ARG VITE_API_KEY` 或在 compose 中重建。
+### 6.5 Graphviz 本地不可用
 
----
+本地没有 Graphviz 时，图表能力会返回 DOT 源码。安装 Graphviz 后确保 `dot` 命令在 PATH 中。
 
-## 2. Docker Compose（推荐）
+Docker 后端镜像已安装 Graphviz，不需要额外安装。
+
+### 6.6 Docker 前端无法访问后端
+
+前端容器中的 Nginx 将 `/api/` 反向代理到 `http://backend:8010/api/`。如果接口不可用，先检查：
 
 ```bash
-# 1. 配置 .env（含 OPENAI_API_KEY、API_AUTH_KEY）
+docker compose ps
+docker compose logs backend
+docker compose logs frontend
+```
+
+### 6.7 多 worker 问题
+
+项目使用 SQLite checkpoint，后端保持 `workers=1`。Compose 中已设置：
+
+```yaml
+UVICORN_WORKERS: "1"
+WEB_CONCURRENCY: "1"
+```
+
+## 7. 验证命令
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/backend tests/agent/test_safe_trace.py tests/agent/test_capability_catalog.py tests/agent/test_routing.py tests/agent/test_golden_routes.py -q --no-cov
+```
+
+```powershell
+cd frontend
+npm run test
+npm run typecheck
+npm run build
+```
+
+```bash
+docker compose config
 docker compose build
-docker compose up -d
-
-# 2. 访问
-# UI + API: http://localhost:8010
-# Swagger:  http://localhost:8010/api/docs
 ```
-
-数据持久化在 `./data` 卷（chat / demo / checkpoint / logs）。
-
-**健康检查：**
-
-- Liveness: `GET /api/health` — 进程存活
-- Readiness: `GET /api/ready` — LLM Key、chat 库、checkpoint 目录
-
----
-
-## 3. 裸机 / VM 部署
-
-```bash
-python -m venv .venv
-source .venv/bin/activate   # Windows: .\.venv\Scripts\Activate.ps1
-pip install -e .
-multi-agent-init-demo
-
-cd frontend && npm ci && VITE_API_KEY=xxx npm run build && cd ..
-
-export APP_ENV=production SERVE_FRONTEND=true LOG_FORMAT=json
-multi-agent-backend
-```
-
-Windows 等价脚本：`.\scripts\run_backend_prod.ps1`
-
-Makefile：`make backend-prod`
-
----
-
-## 4. 反向代理（Nginx 示例）
-
-若前后端分域部署，前端 `npm run build` 后由 Nginx 托管静态文件，API 反代到 8010：
-
-```nginx
-location /api/ {
-    proxy_pass http://127.0.0.1:8010;
-    proxy_http_version 1.1;
-    proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-API-Key $http_x_api_key;
-    proxy_buffering off;   # SSE 必须关闭缓冲
-}
-
-location / {
-    root /var/www/multi-agent/frontend/dist;
-    try_files $uri $uri/ /index.html;
-}
-```
-
----
-
-## 5. 安全清单
-
-- [ ] 设置强随机 `API_AUTH_KEY`
-- [ ] `CORS_ORIGINS` 不要用 `*`
-- [ ] 生产设置 `TRUSTED_HOSTS`
-- [ ] 启用 `CHAT_RATE_LIMIT_PER_MINUTE` 防止 LLM 成本失控
-- [ ] `.env` 不入库；密钥轮换后更新
-- [ ] 启动前清除代理变量（见 README）
-
----
-
-## 6. 运维命令
-
-| 命令 | 用途 |
-|------|------|
-| `multi-agent-backend` | 生产启动（无 reload，workers=1） |
-| `multi-agent-init-demo` | 初始化/刷新业务演示库 |
-| `multi-agent-cli "问题"` | CLI 烟囱测试（不经 HTTP） |
-| `make ci` | 本地跑齐 CI 检查 |
-
----
-
-## 7. 生产演进路线（可选）
-
-当前 SQLite 方案有意为之。若流量/可靠性要求提高：
-
-1. **Checkpoint** → `langgraph-checkpoint-postgres` + Postgres
-2. **Chat DB** → PostgreSQL（改 `engine.py` URL + Alembic 迁移）
-3. **Worker** → checkpoint 迁移后可评估多 worker + 队列
-4. **长期记忆** → 向量库（pgvector / Qdrant）+ 抽取 pipeline
-5. **Observability** → 已有 LangSmith / OTEL 钩子，生产打开即可
-
----
-
-## 8. 故障排查
-
-| 现象 | 排查 |
-|------|------|
-| `/api/ready` 503 | 看 `checks` 数组：`llm_api_key` / `chat_database` |
-| 401 未授权 | 前端需带 `X-API-Key`；health/ready 无需 Key |
-| 429 限流 | 调大 `CHAT_RATE_LIMIT_PER_MINUTE` 或关为 0 |
-| Agent 无记忆 | 确认 `data/agent_checkpoints.db` 卷持久化 |
-| 多 worker 启动失败 | 预期行为；保持 `workers=1` |
-
-日志：`data/logs/app.log`；Docker 内同路径（挂载卷可见）。
