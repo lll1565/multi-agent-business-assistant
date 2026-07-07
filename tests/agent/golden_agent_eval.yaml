@@ -1,0 +1,37 @@
+# Agent classification golden set — expected agents from keyword routing (no LLM).
+cases:
+  - message: "数据库里有哪些表？"
+    agents: ["npi_db_agent"]
+
+  - message: "get_users 接口文档"
+    agents: ["npi_api_agent"]
+
+  - message: "对比订单 API 和数据库客户数"
+    agents: ["npi_db_agent", "npi_api_agent"]
+
+  - message: "画一个订单流程图"
+    agents: ["npi_diagram_agent"]
+
+  - message: "网上搜索 LangGraph 教程"
+    agents: ["npi_web_agent"]
+
+  - message: "网上搜索 LangGraph 教程"
+    agents: ["npi_web_agent"]
+
+  - message: "联网搜一下 Python 教程"
+    agents: ["npi_web_agent"]
+
+  - message: "帮我画架构图"
+    agents: ["npi_diagram_agent"]
+
+  - message: "数据库 get_users 和订单表"
+    agents: ["npi_api_agent", "npi_db_agent"]
+
+  - message: "网上查 get_users 接口文档"
+    agents: ["npi_api_agent"]
+
+  - message: "画流程图 查订单表"
+    agents: ["npi_diagram_agent"]
+
+  - message: "你好"
+    agents: []

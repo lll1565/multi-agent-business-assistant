@@ -1,0 +1,38 @@
+# Install: pip install pre-commit && pre-commit install
+# Manual:  pre-commit run --all-files
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: mypy-backend
+        name: mypy backend
+        entry: python -m mypy backend
+        language: system
+        types: [python]
+        pass_filenames: false
+        require_serial: true
+
+      - id: mypy-stone-core
+        name: mypy stone core modules
+        entry: >-
+          python -m mypy
+          src/subagent/stone/routing/registry.py
+          src/subagent/stone/routing/classifier.py
+          src/subagent/stone/routing/routing_intents.py
+          src/subagent/stone/routing/routing_types.py
+          src/subagent/stone/routing/api_fastpath.py
+          src/subagent/stone/persistence/checkpointer.py
+          src/subagent/stone/routing/hard_route.py
+          src/subagent/stone/routing/resolve_route.py
+          src/subagent/stone/runtime/core.py
+          src/subagent/stone/runtime/turn_runner.py
+        language: system
+        types: [python]
+        pass_filenames: false
+        require_serial: true

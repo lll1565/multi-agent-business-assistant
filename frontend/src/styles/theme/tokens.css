@@ -1,0 +1,55 @@
+/**
+ * 应用设计令牌（亮/暗）。组件样式优先使用 var(--app-*)
+ */
+:root {
+  /* 对话主栏宽度（与 DeepSeek 类似：居中、统一列宽） */
+  --chat-thread-width: 800px;
+  --chat-gutter-x: 24px;
+  --chat-avatar-slot: 52px;
+  --sidebar-width: 260px;
+  --app-bg-page: #f7f8fc;
+  --app-bg-surface: #ffffff;
+  --app-bg-surface-soft: #fafbfd;
+  --app-bg-input: #ffffff;
+  --app-bg-sidebar: linear-gradient(180deg, #1a1f36 0%, #12152a 100%);
+  --app-border: #ebeef5;
+  --app-border-soft: #e8ebf2;
+  --app-text-primary: #1d2129;
+  --app-text-secondary: #606266;
+  --app-text-muted: #909399;
+  --app-text-thinking: #8b8b8b;
+  --app-shadow-surface: 0 2px 20px rgba(29, 33, 41, 0.07);
+  --app-shadow-input: 0 4px 24px rgba(29, 33, 41, 0.08);
+  --app-accent: #4e6ef2;
+  --app-accent-soft: rgba(78, 110, 242, 0.12);
+  --app-table-header: #f5f7fb;
+  --app-code-bg: #1e1e1e;
+  --app-code-header: #2d2d30;
+  --app-prose-code-bg: #f0f2f8;
+  --app-prose-code-border: #e4e8f0;
+  --app-hljs-bg: #f6f8fa;
+}
+
+html.dark {
+  --app-bg-page: #0f1117;
+  --app-bg-surface: #181b22;
+  --app-bg-surface-soft: #1c2029;
+  --app-bg-input: #1e222c;
+  --app-border: #2a2f3a;
+  --app-border-soft: #323845;
+  --app-text-primary: #e8eaed;
+  --app-text-secondary: #b0b5c0;
+  --app-text-muted: #8b919e;
+  --app-text-thinking: #9aa0ad;
+  --app-shadow-surface: 0 2px 24px rgba(0, 0, 0, 0.35);
+  --app-shadow-input: 0 4px 28px rgba(0, 0, 0, 0.4);
+  --app-accent: #6b8afd;
+  --app-accent-soft: rgba(107, 138, 253, 0.18);
+  --app-table-header: #232833;
+  --app-code-bg: #0d0d0d;
+  --app-code-header: #1a1a1a;
+  --app-prose-code-bg: #252a35;
+  --app-prose-code-border: #353b4a;
+  --app-hljs-bg: #1a1d26;
+  color-scheme: dark;
+}

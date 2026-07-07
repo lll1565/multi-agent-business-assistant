@@ -1,0 +1,56 @@
+# Golden route classification — no LLM / sub-agent invocation.
+# Update when routing rules change intentionally.
+cases:
+  - message: "你好"
+    route: meta_fast
+
+  - message: "你能做什么？"
+    route: meta_fast
+
+  - message: "help"
+    route: meta_fast
+
+  - message: "get_users 接口文档"
+    route: api_fast
+
+  - message: "查看 create_user 接口"
+    route: api_fast
+
+  - message: "有哪些接口"
+    route: api_fast
+
+  - message: "数据库里有哪些表？"
+    route: hard_db
+
+  - message: "查一下订单总数"
+    route: hard_db
+
+  - message: "对比订单 API 和数据库客户数"
+    route: supervisor
+
+  - message: "随便聊点什么"
+    route: supervisor
+
+  - message: "REST API 路径参数"
+    route: supervisor
+
+  - message: "网上搜索 LangGraph 教程"
+    route: supervisor
+
+  - message: "画一个订单流程图"
+    route: supervisor
+
+  - message: "联网搜一下 Python 教程"
+    route: supervisor
+
+  - message: "网上查 get_users 接口文档"
+    route: api_fast
+
+  - message: "数据库 get_users 和订单表"
+    route: supervisor
+
+  - message: ""
+    route: invalid
+
+  - message: "   "
+    route: invalid

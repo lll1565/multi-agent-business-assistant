@@ -1,0 +1,65 @@
+# ===== 环境变量 / 密钥（切勿入库） =====
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+tests/.tmp/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# ===== Node / frontend =====
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ===== IDE / 本地 AI 工具 =====
+.idea/
+.vscode/
+.claude/
+.import_linter_cache/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ===== 本项目运行时数据 =====
+# SQLite 运行时库(本地 init / 首次启动生成,勿入库)
+data/*.db
+data/*.db-wal
+data/*.db-shm
+!data/.gitkeep
+
+# 兼容旧路径(项目根 demo.db)
+demo.db
+demo.db-journal
+demo.db-wal
+demo.db-shm
+
+# 日志(可在本地保留,但不入库)
+data/logs/
+data/diagrams/
+
+# 老的运行时残留目录(已被 data/logs/ 取代)
+run/
+
+# 临时上传 / 草稿
+*.tmp
+*.bak
+
+.venv_from_colleague*/
