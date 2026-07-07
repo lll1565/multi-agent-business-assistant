@@ -1,7 +1,8 @@
 """Session-related API schemas."""
 
-from backend.schemas.chat import MessageOut
 from pydantic import BaseModel, Field
+
+from backend.schemas.chat import MessageOut
 
 
 class SessionCreate(BaseModel):

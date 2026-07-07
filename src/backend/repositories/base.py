@@ -1,8 +1,9 @@
 """Abstract repositories."""
 
 from abc import ABC, abstractmethod
-from backend.domain.entities import Message, Session
 from typing import Any
+
+from backend.domain.entities import Message, Session
 
 
 class SessionRepository(ABC):

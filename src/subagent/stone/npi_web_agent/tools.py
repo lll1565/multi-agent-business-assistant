@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import warnings
+
 from langchain_core.tools import tool
+
 from subagent.config.logging_setup import get_logger
 
 logger = get_logger("agent.web_tools")

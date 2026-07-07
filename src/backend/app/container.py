@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from pathlib import Path
+
 from backend.adapters.stone_agent import StoneAgentService
 from backend.config.paths import resolve_chat_db_path
 from backend.config.settings import get_backend_settings
@@ -13,9 +17,6 @@ from backend.infrastructure.database.engine import (
 from backend.repositories.sqlalchemy_repository import SqlAlchemySessionRepository
 from backend.services.chat_service import DefaultChatService
 from backend.services.session_service import DefaultSessionService
-from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
-from pathlib import Path
 
 
 @dataclass

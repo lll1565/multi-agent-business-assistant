@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterator
+from typing import Any
+
 from langchain_core.messages import HumanMessage
+
 from subagent.config.logging_setup import get_logger
 from subagent.config.settings import get_agent_settings
 from subagent.stone.routing.classifier import build_supervisor_input
@@ -26,7 +29,6 @@ from subagent.stone.runtime.trace import (
     extract_reply,
     message_chunk_text,
 )
-from typing import Any
 
 settings = get_agent_settings()
 logger = get_logger("agent.stream.supervisor")

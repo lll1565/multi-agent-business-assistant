@@ -56,10 +56,7 @@ def build_capability_section(spec: SubAgentSpec) -> str:
 def build_capability_reply() -> str:
     specs = sorted_capability_specs()
     if not specs:
-        return (
-            "## 我能帮你做什么\n\n"
-            "我是一个多能力助手。当前暂无已注册的能力。"
-        )
+        return "## 我能帮你做什么\n\n我是一个多能力助手。当前暂无已注册的能力。"
 
     sections = "\n\n".join(build_capability_section(spec) for spec in specs)
     count = len(specs)
@@ -83,10 +80,7 @@ def build_capability_reply() -> str:
 def build_greeting_reply() -> str:
     specs = sorted_capability_specs()
     if not specs:
-        return (
-            "你好！我是一个多能力助手。\n"
-            "有什么需要，直接说就好，不用记命令。"
-        )
+        return "你好！我是一个多能力助手。\n有什么需要，直接说就好，不用记命令。"
 
     titles = [resolve_capability_title(spec) for spec in specs]
     if len(titles) == 1:
@@ -96,8 +90,4 @@ def build_greeting_reply() -> str:
     else:
         caps = "、".join(f"**{title}**" for title in titles[:-1]) + f"和 **{titles[-1]}**"
 
-    return (
-        f"你好！我是一个多能力助手。\n"
-        f"我可以帮你：{caps}。\n"
-        "有什么需要，直接说就好，不用记命令。"
-    )
+    return f"你好！我是一个多能力助手。\n我可以帮你：{caps}。\n有什么需要，直接说就好，不用记命令。"

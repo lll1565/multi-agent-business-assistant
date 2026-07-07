@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from backend.config.logging_setup import get_logger
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
-from pathlib import Path
 from starlette.staticfiles import StaticFiles
+
+from backend.config.logging_setup import get_logger
 
 logger = get_logger("backend.static")
 

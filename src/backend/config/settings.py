@@ -1,5 +1,9 @@
 """Backend-layer configuration — HTTP, chat DB, logging, tracing."""
 
+from functools import lru_cache
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 from backend.config.paths import resolve_project_root
 from backend.config.ports import (
     backend_port as _default_backend_port,
@@ -13,8 +17,6 @@ from backend.config.ports import (
 from backend.config.ports import (
     frontend_port as _default_frontend_port,
 )
-from functools import lru_cache
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _ENV_FILE = resolve_project_root() / ".env"
 

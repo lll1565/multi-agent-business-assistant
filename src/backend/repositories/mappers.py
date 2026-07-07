@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+from typing import Any
+
 from backend.domain.entities import Message, Session
 from backend.infrastructure.database.models import MessageModel, SessionModel
-from typing import Any
 
 
 def message_to_entity(row: MessageModel) -> Message:

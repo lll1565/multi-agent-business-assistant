@@ -1,13 +1,14 @@
 """Health check endpoints."""
 
+from fastapi import APIRouter, Depends, Request
+from fastapi.responses import JSONResponse
+from sqlalchemy import text
+
 from backend.api.deps import get_request_id
 from backend.config.paths import resolve_project_root
 from backend.config.settings import get_backend_settings
 from backend.core.response import ApiResponse, ok
 from backend.schemas import HealthResponse, ReadyCheck, ReadyResponse
-from fastapi import APIRouter, Depends, Request
-from fastapi.responses import JSONResponse
-from sqlalchemy import text
 from subagent.config.paths import resolve_checkpoint_db_path
 from subagent.config.settings import get_agent_settings
 

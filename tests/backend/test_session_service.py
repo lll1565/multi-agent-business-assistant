@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+
 import pytest
+
 from backend.infrastructure.database.engine import create_chat_database
 from backend.repositories.sqlalchemy_repository import SqlAlchemySessionRepository
 from backend.services.session_service import DefaultSessionService
-from dataclasses import dataclass, field
 from subagent.stone.runtime.contracts import StreamEvent, TurnResult
 
 

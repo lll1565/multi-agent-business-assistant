@@ -1,6 +1,10 @@
 """Backend settings production flags."""
 
-from backend.config.settings import BackendSettings, clear_backend_settings_cache, get_backend_settings
+from backend.config.settings import (
+    BackendSettings,
+    clear_backend_settings_cache,
+    get_backend_settings,
+)
 
 
 def test_production_flags(monkeypatch) -> None:

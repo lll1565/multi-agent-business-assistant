@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from subagent.stone.runtime.trace import build_safe_trace, build_thinking_narrative
 
-
 _RAW_TRACE = {
     "agents_used": ["npi_db_agent"],
     "agent_labels": ["数据库 Agent (npi_db_agent)"],

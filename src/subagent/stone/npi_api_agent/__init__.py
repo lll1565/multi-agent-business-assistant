@@ -1,6 +1,7 @@
 """NPI API documentation subagent."""
 
 import re
+
 from subagent.stone.routing.registry import SubAgentSpec, cancel_when_db_intent
 from subagent.stone.routing.routing_intents import (
     API_ENDPOINT_NAMES,
@@ -36,9 +37,7 @@ AGENT_SPEC = SubAgentSpec(
     fast_path_tools=("query_api_doc", "list_all_apis"),
     uses_persistent_checkpointer=True,
     capability_title="API 接口文档",
-    capability_bullets=(
-        "查询 REST 接口路径、HTTP 方法、参数与响应示例",
-    ),
+    capability_bullets=("查询 REST 接口路径、HTTP 方法、参数与响应示例",),
     capability_examples=(
         "get_users 接口文档",
         "有哪些接口",

@@ -1,15 +1,17 @@
-"""npi_diagram_agent —Deep Agent that turns text into Graphviz diagrams."""
+"""npi_diagram_agent — Deep Agent that turns text into Graphviz diagrams."""
 
 import os
+from functools import lru_cache
+
 from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
-from functools import lru_cache
 from langchain_openai import ChatOpenAI
+
 from subagent.config.settings import get_agent_settings
 
-settings = get_agent_settings()
-
 from .tools import get_diagram_tools
+
+settings = get_agent_settings()
 
 
 def _base_dir() -> str:

@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import time
 import traceback
+from collections.abc import Iterator
+from typing import cast
+
 from backend.config.logging_setup import get_logger
 from backend.config.tracing import span
 from backend.ports.agent import AgentService
-from collections.abc import Iterator
 from subagent.stone.runtime.contracts import StreamEvent, TurnResult, normalize_turn_result
 from subagent.stone.runtime.trace import build_safe_trace
 
@@ -77,7 +79,8 @@ class StoneAgentService(AgentService):
                 "message.length": len(message),
             },
         ):
-            yield from iter_chat_stream_events(message, session_id, request_id)
+            for event in iter_chat_stream_events(message, session_id, request_id):
+                yield cast(StreamEvent, event)
 
     def clear_session_memory(self, session_id: str) -> None:
         from subagent.stone.persistence.checkpointer import delete_session_checkpoints

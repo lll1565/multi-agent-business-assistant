@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import json
 import logging
-from backend.config.tracing import current_trace_id
 from contextvars import ContextVar
 from datetime import UTC, datetime
 from typing import Any
+
+from backend.config.tracing import current_trace_id
 
 request_id_ctx: ContextVar[str | None] = ContextVar("request_id", default=None)
 

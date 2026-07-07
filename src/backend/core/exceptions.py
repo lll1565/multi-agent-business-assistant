@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from backend.core.response import ApiResponse
+from typing import Any
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from typing import Any
+
+from backend.core.response import ApiResponse
 
 
 class AppError(Exception):

@@ -2,7 +2,10 @@
 
 import json
 import re
+from collections.abc import Mapping
 from typing import Any
+
+from subagent.stone.runtime.contracts import AgentTrace
 
 AGENT_LABELS = {
     "npi_db_agent": "数据库 Agent (npi_db_agent)",
@@ -116,8 +119,9 @@ def _messages_this_turn(messages: list[Any]) -> list[Any]:
 
 
 def merge_nested_traces(
-    supervisor_trace: dict[str, Any], nested_traces: list[dict[str, Any]]
-) -> dict[str, Any]:
+    supervisor_trace: Mapping[str, Any],
+    nested_traces: list[dict[str, Any]],
+) -> AgentTrace:
     """Insert sub-agent tool/SQL steps right after each delegate step."""
     if not nested_traces:
         return supervisor_trace
@@ -167,11 +171,11 @@ def merge_nested_traces(
         if agent_key and agent_key not in agents_used:
             agents_used.append(agent_key)
 
-    return {
-        "agents_used": agents_used,
-        "agent_labels": [AGENT_LABELS.get(a, a) for a in agents_used],
-        "steps": merged_steps,
-    }
+    return AgentTrace(
+        agents_used=agents_used,
+        agent_labels=[AGENT_LABELS.get(a, a) for a in agents_used],
+        steps=merged_steps,
+    )
 
 
 def _safe_status_key(step: dict[str, Any]) -> str:
@@ -189,10 +193,7 @@ def _safe_status_key(step: dict[str, Any]) -> str:
     if agent in _AGENT_KIND_STATUS:
         return _AGENT_KIND_STATUS[agent]
 
-    blob = " ".join(
-        str(step.get(k) or "").lower()
-        for k in ("title", "detail", "type")
-    )
+    blob = " ".join(str(step.get(k) or "").lower() for k in ("title", "detail", "type"))
     if "npi_db_agent" in blob or "sql" in blob or "数据库" in blob:
         return "db"
     if "npi_api_agent" in blob or "api" in blob or "接口" in blob:
@@ -206,10 +207,10 @@ def _safe_status_key(step: dict[str, Any]) -> str:
     return "analyzing"
 
 
-def build_safe_trace(trace: dict[str, Any] | None) -> dict[str, Any]:
+def build_safe_trace(trace: Mapping[str, Any] | None) -> AgentTrace:
     """Return a UI-safe trace that contains only whitelisted status text."""
     if not trace:
-        return {"agents_used": [], "agent_labels": [], "steps": []}
+        return AgentTrace(agents_used=[], agent_labels=[], steps=[])
 
     keys: list[str] = []
     for step in trace.get("steps") or []:
@@ -225,7 +226,7 @@ def build_safe_trace(trace: dict[str, Any] | None) -> dict[str, Any]:
             if key and key not in keys:
                 keys.append(key)
 
-    steps = [
+    steps: list[dict[str, Any]] = [
         {
             "type": "status",
             "title": SAFE_STATUS_TEXT[key],
@@ -234,10 +235,14 @@ def build_safe_trace(trace: dict[str, Any] | None) -> dict[str, Any]:
         }
         for key in keys
     ]
-    return {"agents_used": [], "agent_labels": [], "steps": steps}
+    return AgentTrace(
+        agents_used=[],
+        agent_labels=[],
+        steps=steps,
+    )
 
 
-def build_trace(messages: list[Any]) -> dict[str, Any]:
+def build_trace(messages: list[Any]) -> AgentTrace:
     """Build reasoning steps and agents_used from agent message list."""
     steps: list[dict[str, str]] = []
     agents_used: list[str] = []
@@ -328,21 +333,17 @@ def build_trace(messages: list[Any]) -> dict[str, Any]:
                     }
                 )
 
-    return {
-        "agents_used": agents_used,
-        "agent_labels": [AGENT_LABELS.get(a, a) for a in agents_used],
-        "steps": steps,
-    }
+    return AgentTrace(
+        agents_used=agents_used,
+        agent_labels=[AGENT_LABELS.get(a, a) for a in agents_used],
+        steps=steps,
+    )
 
 
 def build_thinking_narrative(trace: dict[str, Any]) -> str:
     """Plain-text narrative for frontend thinking stream, with internals removed."""
     safe_trace = build_safe_trace(trace)
-    return "\n\n".join(
-        step["title"]
-        for step in safe_trace.get("steps") or []
-        if step.get("title")
-    )
+    return "\n\n".join(step["title"] for step in safe_trace.get("steps") or [] if step.get("title"))
 
 
 _WEAK_REPLY_MARKERS = (

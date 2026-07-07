@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+
 from subagent.stone.routing.capability_catalog import build_capability_reply, build_greeting_reply
 
 _META_PATTERNS = re.compile(

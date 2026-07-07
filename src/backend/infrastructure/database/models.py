@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from backend.infrastructure.database.base import Base
 from sqlalchemy import ForeignKey, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from backend.infrastructure.database.base import Base
 
 
 class SessionModel(Base):

@@ -26,9 +26,11 @@ import re
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from re import Pattern
+from typing import TYPE_CHECKING, Any
+
 from subagent.config.logging_setup import get_logger
+from subagent.stone.routing.routing_types import Keyword
 from subagent.stone.safety import SafetyRule
-from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     # Imported only for type checkers / IDE hints; never at runtime so the
@@ -37,8 +39,6 @@ if TYPE_CHECKING:
     pass
 
 logger = get_logger("agent.registry")
-
-from subagent.stone.routing.routing_types import Keyword
 
 
 @dataclass(frozen=True)
@@ -254,21 +254,21 @@ def cancel_when_db_intent() -> tuple[Keyword, ...]:
     """Terms that suppress exclusive routing when DB intent is present."""
     from subagent.stone.routing.routing_intents import CANCEL_WHEN_DB_INTENT
 
-    return cast(tuple[Keyword, ...], CANCEL_WHEN_DB_INTENT)
+    return CANCEL_WHEN_DB_INTENT
 
 
 def cancel_when_db_or_api_intent() -> tuple[Keyword, ...]:
     """Terms that suppress web exclusive routing when DB or API intent appears."""
     from subagent.stone.routing.routing_intents import CANCEL_WHEN_DB_OR_API_INTENT
 
-    return cast(tuple[Keyword, ...], CANCEL_WHEN_DB_OR_API_INTENT)
+    return CANCEL_WHEN_DB_OR_API_INTENT
 
 
 def cancel_when_not_diagram() -> tuple[Keyword, ...]:
     """Strong non-diagram signals (curated db / api / web anchors)."""
     from subagent.stone.routing.routing_intents import CANCEL_WHEN_NOT_DIAGRAM
 
-    return cast(tuple[Keyword, ...], CANCEL_WHEN_NOT_DIAGRAM)
+    return CANCEL_WHEN_NOT_DIAGRAM
 
 
 def aggregated_keywords_for_kinds(registry: SubAgentRegistry, *kinds: str) -> tuple[Keyword, ...]:

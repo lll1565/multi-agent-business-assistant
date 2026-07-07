@@ -1,15 +1,17 @@
-"""npi_api_agent —Deep Agent for API documentation lookup."""
+"""npi_api_agent — Deep Agent for API documentation lookup."""
 
 import os
+from functools import lru_cache
+
 from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
-from functools import lru_cache
 from langchain_openai import ChatOpenAI
+
 from subagent.config.settings import get_agent_settings
 
-settings = get_agent_settings()
-
 from .tools import get_api_tools
+
+settings = get_agent_settings()
 
 
 def _base_dir() -> str:

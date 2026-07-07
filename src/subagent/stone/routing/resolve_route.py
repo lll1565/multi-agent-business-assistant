@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
+
 from subagent.config.logging_setup import get_logger
 from subagent.config.settings import get_agent_settings
 from subagent.stone.routing.api_fastpath import _fast_path_agent, try_api_doc_fast_path
@@ -17,7 +19,6 @@ from subagent.stone.routing.hard_route import _find_hard_route_spec, try_db_hard
 from subagent.stone.routing.meta_fastpath import is_meta_query, try_meta_fast_path
 from subagent.stone.routing.routing_intents import API_LIST_ALL_QUERY_PATTERN
 from subagent.stone.routing.validators import validate_user_message
-from typing import Any
 
 settings = get_agent_settings()
 logger = get_logger("agent.resolve_route")

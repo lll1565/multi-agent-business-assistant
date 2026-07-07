@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 import yaml
-from pathlib import Path
+
 from subagent.stone.routing.resolve_route import RouteKind, resolve_route_kind
 
 _GOLDEN_FILE = Path(__file__).parent / "golden_routes.yaml"

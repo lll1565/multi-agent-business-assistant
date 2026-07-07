@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import os
+from functools import lru_cache
+
 from deepagents import CompiledSubAgent, create_deep_agent
 from deepagents.backends import FilesystemBackend
-from functools import lru_cache
 from langchain_openai import ChatOpenAI
+
 from subagent.config.logging_setup import get_logger
 from subagent.config.settings import get_agent_settings
 from subagent.stone.persistence.checkpointer import get_checkpointer

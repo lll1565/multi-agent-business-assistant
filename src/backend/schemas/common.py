@@ -1,7 +1,8 @@
 """Shared API payload shapes."""
 
-from pydantic import BaseModel
 from typing import Any
+
+from pydantic import BaseModel
 
 
 class OkResponse(BaseModel):

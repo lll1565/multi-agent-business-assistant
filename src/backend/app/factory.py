@@ -2,6 +2,13 @@
 
 import logging
 import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
+from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
+
 from backend.api.deps import get_request_id
 from backend.api.v1.router import api_router
 from backend.app.container import build_container
@@ -15,11 +22,6 @@ from backend.config.tracing import configure_tracing, shutdown_tracing
 from backend.core.exceptions import register_exception_handlers
 from backend.core.response import ApiResponse, ok
 from backend.schemas import RootData
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
-from fastapi import Depends, FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.trustedhost import TrustedHostMiddleware
 from subagent.config.paths import resolve_checkpoint_db_path
 from subagent.config.settings import get_agent_settings
 
