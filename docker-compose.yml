@@ -1,17 +1,24 @@
 services:
-  app:
-    build: .
-    ports:
-      - "8010:8010"
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env
     environment:
       APP_ENV: production
-      SERVE_FRONTEND: "true"
       LOG_FORMAT: json
       UVICORN_HOST: 0.0.0.0
+      DATA_DIR: /app/data
+      DB_PATH: /app/data/demo.db
+      CHAT_DB_PATH: /app/data/chat.db
+      UVICORN_WORKERS: "1"
+      WEB_CONCURRENCY: "1"
+      CORS_ORIGINS: http://localhost:5143,http://127.0.0.1:5143
     volumes:
       - ./data:/app/data
+    ports:
+      - "8010:8010"
     restart: unless-stopped
     healthcheck:
       test:
@@ -19,9 +26,26 @@ services:
           "CMD",
           "python",
           "-c",
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8010/api/ready', timeout=3)",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8010/api/health', timeout=3)",
         ]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 30s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "5143:5143"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5143/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

@@ -40,7 +40,7 @@ export function useChatSend({
   messageState,
   setOnline,
 }: UseChatSendOptions) {
-  const { appendAnswerChunk, appendTraceSteps, finalizeAssistantMessage } = messageState;
+  const { appendAnswerChunk, finalizeAssistantMessage } = messageState;
 
   function findAssistantIndex(assistantId: string): number {
     return messages.value.findIndex((m) => m.id === assistantId);
@@ -89,8 +89,6 @@ export function useChatSend({
     try {
       let streamMode: "answer" | "think" = "answer";
       let tagBuffer = "";
-      let traceStepEmitted = 0;
-
       const appendDelta = (delta: string, idx: number) => {
         if (!delta || idx < 0) return;
         let answerPart = "";
@@ -150,15 +148,6 @@ export function useChatSend({
           if (idx < 0) return;
           const msg = messages.value[idx];
           msg.trace = typedTrace;
-          const { text: thinkingText, nextStepIndex } = appendTraceSteps(
-            msg.liveThinking || "",
-            typedTrace,
-            traceStepEmitted,
-          );
-          traceStepEmitted = nextStepIndex;
-          if (!msg._thinkingSealed && thinkingText.length > (msg.liveThinking || "").length) {
-            msg.liveThinking = thinkingText;
-          }
           void scrollToBottom();
         },
         onReply(reply: string) {

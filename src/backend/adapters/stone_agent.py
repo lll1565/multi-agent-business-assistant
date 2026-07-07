@@ -9,6 +9,7 @@ from backend.config.tracing import span
 from backend.ports.agent import AgentService
 from collections.abc import Iterator
 from subagent.stone.runtime.contracts import StreamEvent, TurnResult, normalize_turn_result
+from subagent.stone.runtime.trace import build_safe_trace
 
 logger = get_logger("backend.agent")
 
@@ -40,6 +41,7 @@ class StoneAgentService(AgentService):
             ms = (time.perf_counter() - t0) * 1000
             turn = normalize_turn_result(result)
             agents = turn["trace"].get("agents_used", [])
+            turn["trace"] = build_safe_trace(turn["trace"])
             logger.info(
                 "[%s] agent.invoke ok session=%s agents=%s reply_len=%d %.0fms",
                 request_id,

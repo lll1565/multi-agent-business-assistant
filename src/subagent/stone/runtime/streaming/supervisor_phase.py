@@ -20,7 +20,12 @@ from subagent.stone.runtime.subagent_wrapper import (
     begin_nested_trace_capture,
     end_nested_trace_capture,
 )
-from subagent.stone.runtime.trace import build_thinking_narrative, extract_reply, message_chunk_text
+from subagent.stone.runtime.trace import (
+    build_safe_trace,
+    build_thinking_narrative,
+    extract_reply,
+    message_chunk_text,
+)
 from typing import Any
 
 settings = get_agent_settings()
@@ -47,14 +52,15 @@ def stream_supervisor_events(
 
     last_trace_json = ""
     last_reply = ""
-    last_thinking_emitted = ""
+    last_thinking_emitted = "正在分析问题"
     final_messages: list[Any] = []
     reply_buffer = ReplyStreamBuffer(chunk_size=settings.reply_buffer_chunk_size)
     chunk = settings.reply_buffer_chunk_size
     got_token_stream = False
-    trace: dict[str, Any] = {"agents_used": [], "agent_labels": [], "steps": []}
+    raw_trace: dict[str, Any] = {"agents_used": [], "agent_labels": [], "steps": []}
+    trace: dict[str, Any] = build_safe_trace(raw_trace)
 
-    yield {"type": "thinking_delta", "delta": "正在分析问题..."}
+    yield {"type": "thinking_delta", "delta": last_thinking_emitted}
 
     trace_bucket = begin_nested_trace_capture()
     try:
@@ -85,8 +91,9 @@ def stream_supervisor_events(
                     continue
 
                 final_messages = data.get("messages") or final_messages
-                trace = trace_snapshot(final_messages)
-                narrative = build_thinking_narrative(trace)
+                raw_trace = trace_snapshot(final_messages)
+                trace = build_safe_trace(raw_trace)
+                narrative = build_thinking_narrative(raw_trace)
                 growth_iter, last_thinking_emitted = iter_thinking_growth_events(
                     narrative, last_thinking_emitted, chunk
                 )
@@ -115,13 +122,15 @@ def stream_supervisor_events(
             )
             fallback = api_doc_fallback(user_message, exc)
             if fallback is not None:
-                yield {"type": "trace", "trace": fallback["trace"]}
+                raw_trace = fallback["trace"]
+                trace = build_safe_trace(raw_trace)
+                yield {"type": "trace", "trace": trace}
                 fb_reply = fallback["reply"]
                 yield from yield_reply_deltas(reply_buffer, fb_reply)
                 last_reply = fb_reply
                 yield {"type": "reply", "reply": fb_reply}
                 final_messages = []
-                trace = fallback["trace"]
+                raw_trace = fallback["trace"]
             else:
                 yield {
                     "type": "error",
@@ -134,8 +143,9 @@ def stream_supervisor_events(
         end_nested_trace_capture(trace_bucket)
 
     if final_messages:
-        trace = trace_snapshot(final_messages)
-        narrative = build_thinking_narrative(trace)
+        raw_trace = trace_snapshot(final_messages)
+        trace = build_safe_trace(raw_trace)
+        narrative = build_thinking_narrative(raw_trace)
         growth_iter, last_thinking_emitted = iter_thinking_growth_events(
             narrative, last_thinking_emitted, chunk
         )
@@ -150,14 +160,15 @@ def stream_supervisor_events(
         if reply:
             yield {"type": "reply", "reply": reply}
     else:
-        trace = (
+        raw_trace = (
             json.loads(last_trace_json)
             if last_trace_json
             else {"agents_used": [], "agent_labels": [], "steps": []}
         )
+        trace = build_safe_trace(raw_trace)
 
-    if not last_reply and trace.get("steps"):
-        for step in reversed(trace.get("steps") or []):
+    if not last_reply and raw_trace.get("steps"):
+        for step in reversed(raw_trace.get("steps") or []):
             detail = step.get("detail") or ""
             if detail and len(detail) > 30 and "【API文档】" in detail:
                 yield from yield_reply_deltas(reply_buffer, detail)

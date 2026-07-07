@@ -26,6 +26,22 @@ TOOL_LABELS = {
     "list_all_apis": "列出全部 API",
 }
 
+SAFE_STATUS_TEXT = {
+    "analyzing": "正在分析问题",
+    "db": "正在查询业务数据",
+    "api": "正在检索接口文档",
+    "web": "正在搜索网页信息",
+    "diagram": "正在生成图表",
+    "organizing": "正在整理结果",
+}
+
+_AGENT_KIND_STATUS = {
+    "npi_db_agent": "db",
+    "npi_api_agent": "api",
+    "npi_web_agent": "web",
+    "npi_diagram_agent": "diagram",
+}
+
 
 def _msg_type(msg: Any) -> str:
     return getattr(msg, "type", "") or msg.__class__.__name__.lower().replace("message", "")
@@ -158,6 +174,69 @@ def merge_nested_traces(
     }
 
 
+def _safe_status_key(step: dict[str, Any]) -> str:
+    step_type = step.get("type") or ""
+    if step_type == "status":
+        title = step.get("title") or ""
+        for key, text in SAFE_STATUS_TEXT.items():
+            if title == text:
+                return key
+        return "analyzing"
+    if step_type in {"thinking", "sub_thinking", "plan"}:
+        return "analyzing"
+
+    agent = str(step.get("agent") or "")
+    if agent in _AGENT_KIND_STATUS:
+        return _AGENT_KIND_STATUS[agent]
+
+    blob = " ".join(
+        str(step.get(k) or "").lower()
+        for k in ("title", "detail", "type")
+    )
+    if "npi_db_agent" in blob or "sql" in blob or "数据库" in blob:
+        return "db"
+    if "npi_api_agent" in blob or "api" in blob or "接口" in blob:
+        return "api"
+    if "npi_web_agent" in blob or "web" in blob or "网页" in blob or "搜索" in blob:
+        return "web"
+    if "npi_diagram_agent" in blob or "diagram" in blob or "图表" in blob or "图" in blob:
+        return "diagram"
+    if step_type in {"tool_result", "sub_tool_result", "sub_summary", "info"}:
+        return "organizing"
+    return "analyzing"
+
+
+def build_safe_trace(trace: dict[str, Any] | None) -> dict[str, Any]:
+    """Return a UI-safe trace that contains only whitelisted status text."""
+    if not trace:
+        return {"agents_used": [], "agent_labels": [], "steps": []}
+
+    keys: list[str] = []
+    for step in trace.get("steps") or []:
+        if not isinstance(step, dict):
+            continue
+        key = _safe_status_key(step)
+        if key not in keys:
+            keys.append(key)
+
+    if not keys and trace.get("agents_used"):
+        for agent in trace.get("agents_used") or []:
+            key = _AGENT_KIND_STATUS.get(str(agent))
+            if key and key not in keys:
+                keys.append(key)
+
+    steps = [
+        {
+            "type": "status",
+            "title": SAFE_STATUS_TEXT[key],
+            "detail": None,
+            "agent": None,
+        }
+        for key in keys
+    ]
+    return {"agents_used": [], "agent_labels": [], "steps": steps}
+
+
 def build_trace(messages: list[Any]) -> dict[str, Any]:
     """Build reasoning steps and agents_used from agent message list."""
     steps: list[dict[str, str]] = []
@@ -257,31 +336,13 @@ def build_trace(messages: list[Any]) -> dict[str, Any]:
 
 
 def build_thinking_narrative(trace: dict[str, Any]) -> str:
-    """Plain-text narrative for frontend thinking stream (hard route / snapshot paths)."""
-    parts: list[str] = []
-    for step in trace.get("steps") or []:
-        t = step.get("type") or ""
-        if t in ("thinking", "sub_thinking"):
-            d = (step.get("detail") or "").strip()
-            if d:
-                parts.append(d)
-        elif t == "delegate":
-            d = (step.get("detail") or step.get("title") or "").strip()
-            if d:
-                parts.append(d)
-        elif t in ("tool", "sub_tool"):
-            title = (step.get("title") or "").strip()
-            if title:
-                parts.append(title)
-        elif t == "plan":
-            d = (step.get("detail") or "").strip()
-            if d:
-                parts.append(d)
-        elif t == "info":
-            d = (step.get("detail") or "").strip()
-            if d:
-                parts.append(d)
-    return "\n\n".join(parts)
+    """Plain-text narrative for frontend thinking stream, with internals removed."""
+    safe_trace = build_safe_trace(trace)
+    return "\n\n".join(
+        step["title"]
+        for step in safe_trace.get("steps") or []
+        if step.get("title")
+    )
 
 
 _WEAK_REPLY_MARKERS = (

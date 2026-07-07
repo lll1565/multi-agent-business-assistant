@@ -30,7 +30,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { ArrowDown } from "@element-plus/icons-vue";
 import ThinkingStream from "./ThinkingStream.vue";
-import { buildThinkingDisplayText } from "../utils/traceNarrative";
+import { buildSafeStatusLines, buildThinkingDisplayText } from "../utils/traceNarrative";
 import { useStickToBottom } from "../composables/useStickToBottom";
 
 const props = defineProps({
@@ -191,12 +191,8 @@ function onHeaderClick() {
 }
 
 const statusHint = computed(() => {
-  const steps = props.trace?.steps || [];
-  const last = steps[steps.length - 1];
-  if (!last) return "正在分析问题…";
-  if (last.type === "delegate") return last.title || "正在委派子 Agent…";
-  if (last.type === "tool" || last.type === "sub_tool") return last.title || "正在调用工具…";
-  return "正在分析问题…";
+  const lines = buildSafeStatusLines(props.trace);
+  return lines[lines.length - 1] || "正在分析问题";
 });
 
 onBeforeUnmount(stopLiveTimer);

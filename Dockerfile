@@ -1,21 +1,14 @@
-# Multi-stage production image — API + built frontend on port 8010
-
-FROM node:20-alpine AS frontend-build
-WORKDIR /app/frontend
-COPY frontend/package.json frontend/package-lock.json* ./
-RUN npm ci
-COPY frontend/ ./
-RUN npm run build
-
-FROM python:3.11-slim AS runtime
+FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     APP_ENV=production \
-    SERVE_FRONTEND=true \
     LOG_FORMAT=json \
-    UVICORN_HOST=0.0.0.0
+    UVICORN_HOST=0.0.0.0 \
+    DATA_DIR=/app/data \
+    DB_PATH=/app/data/demo.db \
+    CHAT_DB_PATH=/app/data/chat.db
 
 WORKDIR /app
 
@@ -25,13 +18,11 @@ RUN apt-get update \
 
 COPY pyproject.toml README.md ./
 COPY src ./src
-RUN pip install --upgrade pip && pip install -e .
-
-COPY --from=frontend-build /app/frontend/dist ./frontend/dist
 COPY scripts/docker_entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 
-RUN mkdir -p /app/data/logs /app/data/diagrams
+RUN pip install -e . \
+    && chmod +x /entrypoint.sh \
+    && mkdir -p /app/data/logs /app/data/diagrams
 
 EXPOSE 8010
 
