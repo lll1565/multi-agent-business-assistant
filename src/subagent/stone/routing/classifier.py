@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+
 from subagent.stone.routing.registry import (
     any_keyword_matches,
     discover_stone_agents,

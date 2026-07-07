@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass, field
+from typing import Any
+
 import pytest
+
 from backend.infrastructure.database.engine import create_chat_database
 from backend.repositories.sqlalchemy_repository import SqlAlchemySessionRepository
 from backend.services.chat_service import DefaultChatService
-from dataclasses import dataclass, field
 from subagent.stone.runtime.contracts import StreamEvent, TurnResult
-from typing import Any
 
 
 @dataclass

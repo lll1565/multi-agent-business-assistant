@@ -9,9 +9,11 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from pathlib import Path
+
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
+
 from subagent.config.paths import resolve_demo_db_path
 
 

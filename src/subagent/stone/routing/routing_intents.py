@@ -7,6 +7,7 @@ lists from here so routing stays in sync when the demo DB or API catalog changes
 from __future__ import annotations
 
 import re
+
 from subagent.stone.routing.routing_types import Keyword
 
 API_ENDPOINT_NAMES: tuple[str, ...] = (

@@ -7,9 +7,12 @@ so adding a new hard-routable agent is a registry-only change.
 from __future__ import annotations
 
 from functools import lru_cache
+from typing import Any, cast
+
 from langchain_core.messages import HumanMessage
 from langchain_core.runnables import Runnable
 from langchain_core.runnables.config import RunnableConfig
+
 from subagent.config.logging_setup import get_logger
 from subagent.config.settings import get_agent_settings
 from subagent.stone.persistence.checkpointer import subagent_thread_id
@@ -25,7 +28,6 @@ from subagent.stone.runtime.subagent_wrapper import (
     wrap_subagent_runnable,
 )
 from subagent.stone.runtime.trace import AGENT_LABELS, extract_reply, merge_nested_traces
-from typing import Any, cast
 
 settings = get_agent_settings()
 logger = get_logger("agent.hard_route")

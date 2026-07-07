@@ -1,9 +1,10 @@
 """Abstract services."""
 
 from abc import ABC, abstractmethod
-from backend.schemas import ChatResponse, ReasoningTrace
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from typing import Any
+
+from backend.schemas import ChatResponse, ReasoningTrace
 
 __all__ = ["ChatService", "SessionService"]
 
@@ -53,7 +54,7 @@ class ChatService(ABC):
         pass
 
     @staticmethod
-    def build_trace(trace_data: dict[str, Any] | None) -> ReasoningTrace | None:
+    def build_trace(trace_data: Mapping[str, Any] | None) -> ReasoningTrace | None:
         if not trace_data:
             return None
         from backend.schemas import ReasoningStep

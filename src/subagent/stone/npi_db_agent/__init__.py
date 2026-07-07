@@ -1,6 +1,7 @@
 """NPI database subagent (Deep Agent + skills)."""
 
 import re
+
 from subagent.stone.routing.registry import SubAgentSpec
 from subagent.stone.routing.routing_intents import DB_TABLE_NAMES
 from subagent.stone.safety import SafetyRule

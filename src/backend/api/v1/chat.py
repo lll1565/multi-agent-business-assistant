@@ -1,14 +1,16 @@
 """Chat endpoints - sync and SSE stream."""
 
+from collections.abc import Iterator
+
+from fastapi import APIRouter, Depends
+from fastapi.responses import StreamingResponse
+
 from backend.api.deps import get_chat_service, get_request_id, get_session_service
 from backend.config.logging_setup import get_logger
 from backend.core.exceptions import NotFoundError
 from backend.core.response import ApiResponse, ok
 from backend.schemas import ChatRequest, ChatResponse
 from backend.services.base import ChatService, SessionService
-from collections.abc import Iterator
-from fastapi import APIRouter, Depends
-from fastapi.responses import StreamingResponse
 
 router = APIRouter(tags=["聊天"])
 

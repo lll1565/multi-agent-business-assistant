@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
+from fastapi.testclient import TestClient
+
 from backend.app.factory import create_app
 from backend.app.rate_limit import reset_chat_rate_limiter
 from backend.config.settings import clear_backend_settings_cache
@@ -10,9 +14,6 @@ from backend.infrastructure.database.engine import create_chat_database, init_sc
 from backend.repositories.sqlalchemy_repository import SqlAlchemySessionRepository
 from backend.services.chat_service import DefaultChatService
 from backend.services.session_service import DefaultSessionService
-from fastapi.testclient import TestClient
-from pathlib import Path
-
 from tests.conftest import FakeAgentService
 
 

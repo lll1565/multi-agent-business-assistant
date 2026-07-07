@@ -1,9 +1,11 @@
 """FastAPI dependencies - resolve services from container."""
 
+from typing import cast
+
+from fastapi import Request
+
 from backend.app.container import AppContainer
 from backend.services.base import ChatService, SessionService
-from fastapi import Request
-from typing import cast
 
 
 def get_container(request: Request) -> AppContainer:

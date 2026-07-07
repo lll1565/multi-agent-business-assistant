@@ -1,7 +1,8 @@
 """Chat-related API schemas."""
 
-from pydantic import BaseModel, Field, field_validator
 from typing import Any
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class ChatRequest(BaseModel):

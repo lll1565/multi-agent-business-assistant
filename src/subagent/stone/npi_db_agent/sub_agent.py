@@ -1,16 +1,18 @@
-"""npi_db_agent —Deep Agent for text-to-SQL (aligned with deepagents example)."""
+"""npi_db_agent — Deep Agent for text-to-SQL."""
 
 import os
+from functools import lru_cache
+from pathlib import Path
+
 from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
-from functools import lru_cache
 from langchain_openai import ChatOpenAI
-from pathlib import Path
-from subagent.config.settings import get_agent_settings
 
-settings = get_agent_settings()
+from subagent.config.settings import get_agent_settings
 from subagent.stone.persistence.tools import get_sql_tools
 from subagent.stone.safety import format_safety_rules
+
+settings = get_agent_settings()
 
 
 def _base_dir() -> str:

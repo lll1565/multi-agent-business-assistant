@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from langchain_core.messages import HumanMessage
+
 from subagent.config.logging_setup import get_logger
 from subagent.config.settings import get_agent_settings
 from subagent.config.tracing import span
@@ -15,7 +18,6 @@ from subagent.stone.runtime.subagent_wrapper import (
     end_nested_trace_capture,
 )
 from subagent.stone.runtime.trace import build_trace, extract_reply, merge_nested_traces
-from typing import Any
 
 settings = get_agent_settings()
 logger = get_logger("agent.turn_runner")

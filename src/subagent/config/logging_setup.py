@@ -6,6 +6,7 @@ import logging
 import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+
 from subagent.config.paths import resolve_project_root
 
 _FORMAT = "%(asctime)s | %(levelname)-7s | %(name)s | %(message)s"

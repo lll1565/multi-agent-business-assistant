@@ -1,6 +1,7 @@
 """NPI diagram subagent (Graphviz DOT -> PNG/SVG, graceful fallback)."""
 
 import re
+
 from subagent.stone.routing.registry import SubAgentSpec, cancel_when_not_diagram
 from subagent.stone.routing.routing_intents import DIAGRAM_EXCLUSIVE_KEYWORDS
 

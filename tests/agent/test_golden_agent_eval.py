@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 import yaml
-from pathlib import Path
+
 from subagent.stone.routing.classifier import classify_query_agents
 
 _GOLDEN_FILE = Path(__file__).parent / "golden_agent_eval.yaml"

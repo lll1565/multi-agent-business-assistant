@@ -5,6 +5,8 @@ from __future__ import annotations
 import importlib
 from dataclasses import dataclass
 from functools import lru_cache
+from typing import Any, Protocol
+
 from subagent.config.logging_setup import get_logger
 from subagent.stone.routing.classifier import (
     classify_query_agents,
@@ -13,7 +15,6 @@ from subagent.stone.routing.classifier import (
 )
 from subagent.stone.routing.registry import SubAgentSpec, discover_stone_agents, get_registry
 from subagent.stone.routing.routing_intents import API_LIST_ALL_QUERY_PATTERN
-from typing import Any, Protocol
 
 logger = get_logger("agent.api_fastpath")
 

@@ -4,18 +4,20 @@ from __future__ import annotations
 
 import json
 import uuid
+from collections.abc import Iterator
+from contextlib import contextmanager
+from datetime import UTC, datetime
+from typing import Any
+
+from sqlalchemy import delete, select, update
+from sqlalchemy.orm import Session
+
 from backend.domain.entities import Message
 from backend.domain.entities import Session as ChatSession
 from backend.infrastructure.database.engine import ChatDatabase, init_schema
 from backend.infrastructure.database.models import MessageModel, SessionModel
 from backend.repositories.base import SessionRepository
 from backend.repositories.mappers import message_to_entity, session_to_entity
-from collections.abc import Iterator
-from contextlib import contextmanager
-from datetime import UTC, datetime
-from sqlalchemy import delete, select, update
-from sqlalchemy.orm import Session
-from typing import Any
 
 DEFAULT_TITLE = "新对话"
 

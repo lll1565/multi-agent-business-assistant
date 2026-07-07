@@ -12,16 +12,18 @@ SQL validation.
 from __future__ import annotations
 
 from collections.abc import Iterable
+
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool, StructuredTool
 from pydantic import BaseModel, Field
-from subagent.config.settings import get_agent_settings
 
-settings = get_agent_settings()
+from subagent.config.settings import get_agent_settings
 from subagent.stone.routing.validators import enforce_row_limit, validate_sql
 from subagent.stone.safety import SafetyRule, rules_require
 
 from .database import SqlDb, get_database
+
+settings = get_agent_settings()
 
 # ---------------------------------------------------------------------------
 # Tool input schemas

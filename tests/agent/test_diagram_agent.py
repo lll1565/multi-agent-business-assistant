@@ -1,7 +1,9 @@
 """Tests for the npi_diagram_agent (routing + tool formatting + fallback)."""
 
-import pytest
 from pathlib import Path
+
+import pytest
+
 from subagent.stone.npi_diagram_agent.tools import (
     _format_size,
     _resolve_dot_binary,

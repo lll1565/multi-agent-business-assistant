@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from typing import Any
+
 from subagent.stone.runtime.delta_emitter import ReplyStreamBuffer, iter_uniform_deltas
 from subagent.stone.runtime.subagent_wrapper import get_nested_traces
 from subagent.stone.runtime.trace import build_trace, merge_nested_traces
-from typing import Any
 
 
 def trace_snapshot(messages: list[Any]) -> dict[str, Any]:

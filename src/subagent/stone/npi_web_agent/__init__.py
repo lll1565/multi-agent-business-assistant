@@ -1,6 +1,7 @@
 """NPI web search subagent (DuckDuckGo)."""
 
 import re
+
 from subagent.stone.routing.registry import SubAgentSpec, cancel_when_db_or_api_intent
 from subagent.stone.routing.routing_intents import WEB_EXCLUSIVE_KEYWORDS
 

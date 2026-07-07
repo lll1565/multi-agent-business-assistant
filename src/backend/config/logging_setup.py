@@ -5,10 +5,11 @@ from __future__ import annotations
 import logging
 import os
 import sys
-from backend.config.paths import resolve_project_root
-from backend.config.structured_log import JsonLogFormatter
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+
+from backend.config.paths import resolve_project_root
+from backend.config.structured_log import JsonLogFormatter
 
 _FORMAT = "%(asctime)s | %(levelname)-7s | %(name)s | %(message)s"
 _DATE_FMT = "%Y-%m-%d %H:%M:%S"

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uvicorn
+
 from backend.config.settings import get_backend_settings
 
 

@@ -1,7 +1,8 @@
 """Tests for shared path resolution."""
 
-from backend.config.paths import resolve_chat_db_path
 from pathlib import Path
+
+from backend.config.paths import resolve_chat_db_path
 from subagent.config.paths import (
     resolve_checkpoint_db_path,
     resolve_data_dir,

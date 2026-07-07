@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from typing import Any
+
 from subagent.config.logging_setup import get_logger
 from subagent.stone.routing.resolve_route import RouteKind, resolve_route
 from subagent.stone.runtime.streaming.fast_path import emit_fast_or_hard_result
 from subagent.stone.runtime.streaming.supervisor_phase import stream_supervisor_events
-from typing import Any
 
 logger = get_logger("agent.stream")
 

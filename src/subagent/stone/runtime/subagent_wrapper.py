@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import contextvars
+from typing import Any
+
 from langchain_core.runnables import Runnable, RunnableConfig
+
 from subagent.config.logging_setup import get_logger
 from subagent.stone.persistence.checkpointer import subagent_thread_id
 from subagent.stone.runtime.trace import build_trace
-from typing import Any
 
 logger = get_logger("agent.subagent")
 

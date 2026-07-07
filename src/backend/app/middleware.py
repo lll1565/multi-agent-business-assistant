@@ -3,6 +3,11 @@
 import logging
 import time
 import uuid
+from collections.abc import Awaitable, Callable
+
+from fastapi import Request
+from starlette.responses import JSONResponse, Response
+
 from backend.app.rate_limit import get_chat_rate_limiter
 from backend.app.security import (
     api_key_is_valid,
@@ -15,9 +20,6 @@ from backend.config.settings import get_backend_settings
 from backend.config.structured_log import log_event, set_request_id
 from backend.config.tracing import current_trace_id, span
 from backend.core.response import ApiResponse
-from collections.abc import Awaitable, Callable
-from fastapi import Request
-from starlette.responses import JSONResponse, Response
 
 logger = get_logger("backend.api")
 

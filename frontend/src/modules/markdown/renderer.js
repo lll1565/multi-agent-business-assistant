@@ -55,7 +55,7 @@ function enhanceApiDocHtml(html) {
   if (!html) return html;
   let out = html;
 
-  const methodBadge = (method, cls) =>
+  const methodBadge = (method) =>
     new RegExp(
       `<td>(\\s*)<strong>${method}</strong>(\\s*)</td>`,
       "gi"
@@ -71,7 +71,7 @@ function enhanceApiDocHtml(html) {
 
   for (const [method, cls] of methods) {
     out = out.replace(
-      methodBadge(method, cls),
+      methodBadge(method),
       `<td><span class="http-badge ${cls}">${method}</span></td>`
     );
   }

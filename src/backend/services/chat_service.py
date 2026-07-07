@@ -4,6 +4,10 @@ from __future__ import annotations
 
 import asyncio
 import json
+from collections.abc import Iterator, Mapping
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any
+
 from backend.config.logging_setup import get_logger
 from backend.domain.entities import Message
 from backend.ports.agent import AgentService
@@ -11,9 +15,6 @@ from backend.repositories.base import SessionRepository
 from backend.repositories.mappers import message_entity_to_dict
 from backend.schemas import ChatResponse
 from backend.services.base import ChatService
-from collections.abc import Iterator
-from concurrent.futures import ThreadPoolExecutor
-from typing import Any
 
 logger = get_logger("backend.chat")
 
@@ -43,13 +44,13 @@ class DefaultChatService(ChatService):
         self,
         session_id: str,
         reply: str,
-        trace: dict[str, Any] | None = None,
+        trace: Mapping[str, Any] | None = None,
     ) -> Message:
         return self._repo.add_message(
             session_id,
             "assistant",
             reply,
-            trace=trace,
+            trace=dict(trace) if trace is not None else None,
         )
 
     def _persist_generation_failure(self, session_id: str, error: str) -> None:
@@ -149,5 +150,5 @@ class DefaultChatService(ChatService):
         return await self.chat(session.id, message, request_id)
 
     @staticmethod
-    def _sse_line(payload: dict[str, Any]) -> str:
+    def _sse_line(payload: Mapping[str, Any]) -> str:
         return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"

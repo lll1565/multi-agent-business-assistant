@@ -1,12 +1,14 @@
 """Session CRUD endpoints."""
 
+from typing import Any
+
+from fastapi import APIRouter, Depends
+
 from backend.api.deps import get_request_id, get_session_service
 from backend.core.exceptions import NotFoundError
 from backend.core.response import ApiResponse, ok
 from backend.schemas import OkData, SessionCreate, SessionListData, SessionUpdate
 from backend.services.base import SessionService
-from fastapi import APIRouter, Depends
-from typing import Any
 
 router = APIRouter(prefix="/sessions", tags=["会话"])
 

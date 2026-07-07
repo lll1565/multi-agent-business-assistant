@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from typing import Any
+
 from subagent.config.settings import get_agent_settings
 from subagent.stone.runtime.delta_emitter import ReplyStreamBuffer, iter_uniform_deltas
 from subagent.stone.runtime.streaming.helpers import yield_thinking_only
 from subagent.stone.runtime.trace import build_safe_trace, build_thinking_narrative
-from typing import Any
 
 settings = get_agent_settings()
 

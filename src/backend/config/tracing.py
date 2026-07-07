@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import logging
 import os
-from backend.config.settings import BackendSettings
 from collections.abc import Iterator
 from contextlib import contextmanager
 from typing import Any
+
+from backend.config.settings import BackendSettings
 
 logger = logging.getLogger("app.tracing")
 

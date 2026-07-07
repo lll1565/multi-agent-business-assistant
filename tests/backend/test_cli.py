@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from backend.cli import main
 from unittest.mock import patch
+
+from backend.cli import main
 
 
 def test_multi_agent_backend_cli_invokes_uvicorn() -> None:

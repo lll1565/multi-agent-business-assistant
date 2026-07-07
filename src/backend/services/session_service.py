@@ -1,11 +1,12 @@
 """Concrete SessionService."""
 
+from typing import Any
+
 from backend.config.logging_setup import get_logger
 from backend.ports.agent import AgentService
 from backend.repositories.base import SessionRepository
 from backend.repositories.mappers import session_entity_to_dict
 from backend.services.base import SessionService
-from typing import Any
 
 logger = get_logger("backend.session")
 
