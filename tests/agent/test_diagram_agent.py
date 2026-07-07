@@ -27,13 +27,37 @@ def test_discover_finds_diagram_agent():
     assert spec.exclusive_cancel_keywords
 
 
-def test_diagram_agent_build_is_cached():
-    from subagent.stone.npi_diagram_agent import create_npi_diagram_agent
+def test_diagram_agent_build_is_cached(monkeypatch):
+    from subagent.stone.npi_diagram_agent import sub_agent as diagram_sub_agent
 
-    a1 = create_npi_diagram_agent()
-    a2 = create_npi_diagram_agent()
-    assert a1 is a2
+    sentinel = object()
+    build_count = 0
 
+    def fake_create_llm():
+        return object()
+
+    def fake_create_deep_agent(**_kwargs):
+        nonlocal build_count
+        build_count += 1
+        return sentinel
+
+    monkeypatch.setattr(diagram_sub_agent, "_create_llm", fake_create_llm)
+    monkeypatch.setattr(
+        diagram_sub_agent,
+        "create_deep_agent",
+        fake_create_deep_agent,
+    )
+
+    diagram_sub_agent.create_npi_diagram_agent.cache_clear()
+    try:
+        a1 = diagram_sub_agent.create_npi_diagram_agent()
+        a2 = diagram_sub_agent.create_npi_diagram_agent()
+
+        assert a1 is a2
+        assert a1 is sentinel
+        assert build_count == 1
+    finally:
+        diagram_sub_agent.create_npi_diagram_agent.cache_clear()
 
 @pytest.mark.parametrize(
     "message",
